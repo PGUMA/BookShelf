@@ -126,6 +126,66 @@ for(let i = 0, i < array.length; i++) {
     
 ## 4章　モジュラー化によるコードの再利用
 ---
+
+> 正常に機能する複雑なシステムは概して、動作する単純なシステムから進化したものである
+
+
+- 関数は入力型と出力型とのマッピングでもある
+
+        メソッド同士をつないでしまうと強く結合し、限られた表現力となってしまう
+        関数をパイプラインすると緩く結合し、柔軟性が出る
+
+### パイプライン処理のための互換性のある関数
+
+- 型互換
+関数の入出力に関して関数間で互換性があること
+- アリティ（引数の個数）
+できる限り単一の引数を受付ける関数とすることで柔軟性が高まり責務も限定された安定した関数となる
+
+### カリー化
+
+    複数変数の関数を複数の単項関数に変換することで元の関数を段階的に実行するテクニック
+    ※すべての引数が提供されるまで処理が遅延される（すべての引数が揃うまでは関数が返る）
+
+- 使いどころ
+    - 関数のファクトリ（テンプレート化）
+    ```typescript
+    const getUserFromDB = (id: string) => {
+        return {"id": id,"from": "DB"}
+    }
+
+    const getUserFromCache = (id: string) => {
+        return {"id": id,"from": "Cache"}
+    }
+
+    const getUser = (from: "db" | "cache"): (id:string) => object => {
+        if(from === "db") {
+            return getUserFromDB
+        } else {
+            return getUserFromCache
+        }
+    }
+
+    const user = getUser("cache")("111111111")
+    console.log(user)
+    ```
+
+### 部分適用
+
+カリー化（テンプレート化）した関数の引数の一部を固定化して、関数を複製すること
+
+```typescript
+const greet = (you: string) => (message:string) => {
+    return () => console.log(`${message}. ${you}!`)
+}
+
+const greetToFriend = greet("friend")
+
+greetToFriend("good morning")()
+greetToFriend("good afternoon")()
+greetToFriend("good evening")()
+```
+
 ## 5章　複雑性を抑えるデザインパターン
 ---
 ## 6章　関数型コードのテスト
